@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Measure stereoacuity with red/cyan random dot stereograms at a range of disparities.">
+<title>Stereo test — Dot studio</title>
+<style>
+:root{color-scheme:light;--ink:#23392f;--muted:#68766d;--line:#dde2d8;--paper:#fafbf6;--green:#2b634b;--mint:#e5efdc;--warn:#a33028}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #91b77c;outline-offset:3px}
+header{max-width:1440px;margin:auto;padding:27px 40px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{display:flex;align-items:center;gap:13px;font-size:21px;font-weight:700;letter-spacing:-.7px}.mark{display:grid;grid-template-columns:repeat(3,5px);gap:4px;transform:rotate(-12deg)}.mark i{width:5px;height:5px;border-radius:50%;background:var(--green)}.mark i:nth-child(3n){opacity:.4}header a{font-size:13px;color:var(--green)}
+main{max-width:1440px;margin:auto;padding:37px 40px 40px}.eyebrow{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--green);font-weight:700}h1{font-size:clamp(29px,3vw,40px);font-weight:600;line-height:1.2;letter-spacing:-1.6px;margin:9px 0 10px}.intro{margin-bottom:29px}.intro p{margin:0;color:var(--muted);max-width:760px}
+.workspace{display:grid;grid-template-columns:340px minmax(0,1fr);gap:24px;align-items:start}.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:24px}.section-title{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--muted);margin:0 0 16px}.rule{height:1px;background:var(--line);margin:1px 0 20px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{margin-bottom:18px}label,.label{display:block;font-size:13px;font-weight:600;margin-bottom:7px}.input-wrap{position:relative}.input-wrap span{position:absolute;right:12px;top:10px;font-size:12px;color:var(--muted);pointer-events:none}input[type=number],input[type=text],select{width:100%;height:42px;border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:#fcfdf9;color:var(--ink);min-width:0}input.unit{padding-right:42px}input[aria-invalid=true]{border-color:#c4554c;background:#fff6f4}.hint{font-size:12px;color:var(--muted);margin:7px 0 0;line-height:1.6}
+.status{font-size:13px;border-radius:10px;padding:12px 14px;margin:0 0 16px;background:var(--mint);color:var(--green)}.status.bad{background:#fff1ee;color:var(--warn)}.status strong{display:block;margin-bottom:2px}
+.bar{height:10px;background:var(--ink);border-radius:2px;margin:6px 0 8px}
+.primary,.secondary{border-radius:9px;padding:11px 15px;font-size:13px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:8px}.primary{background:var(--green);color:#fff;border:1px solid var(--green)}.primary:hover{background:#214d3a}.secondary{background:#fff;color:var(--ink);border:1px solid var(--line)}.secondary:hover{background:#f2f5ec}.buttons{display:flex;flex-wrap:wrap;gap:10px;margin:4px 0 14px}
+table{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums}th,td{text-align:right;padding:6px 10px;border-bottom:1px solid var(--line)}th:first-child,td:first-child{text-align:left}th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:24px}.keys{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px;padding:0;list-style:none;font-size:12px}.keys li{background:#f1f4ec;border-radius:6px;padding:4px 8px}.keys kbd{font:600 12px ui-monospace,Menlo,monospace;margin-right:4px}
+ol.steps{margin:0;padding-left:20px;font-size:13px;color:var(--muted)}ol.steps li{margin-bottom:6px}ol.steps strong{color:var(--ink)}
+.views{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.views figure{margin:0}.views canvas{width:100%;height:auto;display:block;border:1px solid var(--line);border-radius:6px;background:#fff}.views figcaption{font-size:11px;color:var(--muted);margin-top:5px}.specs{font-size:12px;color:var(--muted);margin:12px 0 0;word-break:break-all}.specs a{color:var(--green)}
+details{font-size:13px}summary{cursor:pointer;font-weight:600}.key-list{columns:3;font-size:12px;font-variant-numeric:tabular-nums;color:var(--muted);margin-top:10px}
+.result-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}.verdict{font-size:14px;margin:6px 0 14px}.verdict strong{color:var(--green)}.verdict strong.bad,.verdict .bad{color:var(--warn)}svg.plot{width:100%;height:auto;margin:6px 0 10px}.empty{color:var(--muted);font-size:13px}
+#stage{position:fixed;inset:0;z-index:10;background:#000;overflow:hidden}#stage canvas{position:absolute;image-rendering:pixelated}#stage p{position:absolute;left:0;right:0;margin:0;text-align:center;color:#8c8c8c;font-size:14px;line-height:1.6;white-space:pre-line}#prompt{top:30%}#legend{bottom:14px;font-size:12px!important;color:#6b6b6b!important}#legend.nudge{font-size:16px!important;color:#e6e6e6!important}#stage.white #legend.nudge{color:#222!important}#stage.white{background:#fff}#stage.stimulus{cursor:none}
+footer{max-width:1440px;margin:0 auto;padding:0 40px 25px;color:#839083;font-size:11px}
+@media(max-width:1000px){.workspace{grid-template-columns:1fr}.cols{grid-template-columns:1fr}.views{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:620px){header,main{padding-left:16px;padding-right:16px}.key-list{columns:2}}
+</style>
+</head>
+<body>
+<header><div class="brand"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>dot studio</div><a href="index.html">Random dot generator</a></header>
+<main>
+<section class="intro"><div class="eyebrow">Random dot stereograms</div><h1>Stereoacuity test</h1><p>Red/cyan random dot stereograms at a range of disparities, shown in random order. Each eye's image on its own is just random dots; the shape only appears when the two are fused.</p></section>
+<div class="workspace">
+<form class="panel" id="setup" novalidate>
+<h2 class="section-title">01 / Screen</h2>
+<div class="field"><label for="diagonal">Screen diagonal</label><div class="input-wrap"><input class="unit" id="diagonal" type="number" min="5" max="100" step="any" value="15.3"><span>inch</span></div></div>
+<div class="row"><div class="field"><label for="nativeWidth">Native width</label><div class="input-wrap"><input class="unit" id="nativeWidth" type="number" min="100" max="10000" step="1" value="2880"><span>px</span></div></div><div class="field"><label for="nativeHeight">Native height</label><div class="input-wrap"><input class="unit" id="nativeHeight" type="number" min="100" max="10000" step="1" value="1864"><span>px</span></div></div></div>
+<div class="field"><label for="distance">Viewing distance</label><div class="input-wrap"><input class="unit" id="distance" type="number" min="10" max="500" step="any" value="50"><span>cm</span></div></div>
+<div class="rule"></div><h2 class="section-title">02 / Glasses</h2>
+<div class="row"><div class="field"><label for="redEye">Red lens on</label><select id="redEye"><option value="left">Left eye</option><option value="right">Right eye</option></select></div><div class="field"><label for="background">Background</label><select id="background"><option value="black">Black</option><option value="white">White</option></select></div></div>
+<div class="rule"></div><h2 class="section-title">03 / Stimulus</h2>
+<div class="row"><div class="field"><label for="width">Width</label><div class="input-wrap"><input class="unit" id="width" type="number" min="200" max="4000" step="2" value="1280"><span>px</span></div></div><div class="field"><label for="height">Height</label><div class="input-wrap"><input class="unit" id="height" type="number" min="200" max="4000" step="2" value="960"><span>px</span></div></div></div>
+<div class="row"><div class="field"><label for="diameter">Dot diameter</label><div class="input-wrap"><input class="unit" id="diameter" type="number" min="1" max="20" step="1" value="3"><span>px</span></div></div><div class="field"><label for="covered">Dot coverage</label><div class="input-wrap"><input class="unit" id="covered" type="number" min="5" max="90" step="1" value="50"><span>%</span></div></div></div>
+<div class="field"><label for="size">Shape size</label><div class="input-wrap"><input class="unit" id="size" type="number" min="20" max="2000" step="1" value="250"><span>px</span></div><p class="hint">All sizes are screen pixels. Shape size is the radius of a circle with the same area, so every shape covers the same area.</p></div>
+<div class="rule"></div><h2 class="section-title">04 / Trials</h2>
+<div class="field"><label for="levels">Disparities</label><div class="input-wrap"><input class="unit" id="levels" type="text" value="1, 2, 3, 4, 5, 6, 8, 10, 12, 14, 17, 21" spellcheck="false"><span>px</span></div></div>
+<div class="row"><div class="field"><label for="reps">Repeats each</label><input id="reps" type="number" min="1" max="20" step="1" value="3"></div><div class="field"><label for="catchTrials">No-shape trials</label><input id="catchTrials" type="number" min="0" max="50" step="1" value="6"></div></div>
+<div class="row"><div class="field"><label for="controlReps">Control repeats</label><input id="controlReps" type="number" min="1" max="20" step="1" value="3"></div><div class="field"><label for="controlCatch">Control no-shape</label><input id="controlCatch" type="number" min="0" max="50" step="1" value="6"></div></div>
+<div class="row"><div class="field"><label for="participant">Participant</label><input id="participant" type="text" maxlength="40" value="" placeholder="Initials" autocomplete="off"></div><div class="field"><label for="seed">Session seed</label><input id="seed" type="text" maxlength="40" value="20261026" autocomplete="off" spellcheck="false"></div></div>
+<p class="hint">Same settings + same seed = the same stimuli in the same order. Settings are saved in the page link.</p>
+<p class="hint" id="error" role="alert" style="color:var(--warn)"></p>
+</form>
+<div>
+<section class="panel"><h2 class="section-title">Display check</h2><div class="status" id="displayStatus"></div>
+<div class="field"><span class="label">Ruler check</span><div class="bar" id="bar"></div><p class="hint" id="barHint"></p><div class="input-wrap" style="margin-top:8px;max-width:300px"><input class="unit" id="measured" type="text" inputmode="decimal" placeholder="Measured length (optional)" value="" aria-label="Measured bar length"><span>cm</span></div><input id="measuredAt" type="hidden" value=""></div>
+<div class="cols"><div><table id="levelTable"><thead><tr><th>Disparity</th><th>arcsec</th><th>arcmin</th></tr></thead><tbody></tbody></table></div>
+<div><p class="hint" id="geometry" style="margin-top:0"></p><p class="hint" id="trialCount"></p></div></div></section>
+<section class="panel"><h2 class="section-title">Run</h2>
+<div class="buttons"><button class="secondary" type="button" id="runPractice">Practice (with feedback)</button><button class="primary" type="button" id="runGlasses">Start test · glasses</button><button class="secondary" type="button" id="runControl">Start control · no glasses</button></div>
+<ul class="keys"><li><kbd>Space</kbd>show next</li><li><kbd>1</kbd>circle</li><li><kbd>2</kbd>triangle</li><li><kbd>3</kbd>star</li><li><kbd>4</kbd>heart</li><li><kbd>5</kbd>cross</li><li><kbd>0</kbd>no shape</li><li><kbd>⌫</kbd>redo last</li><li><kbd>Q</kbd> <kbd>Q</kbd>stop</li></ul>
+<ol class="steps">
+<li><strong>Set the display to 1:1</strong> so one image pixel is one screen pixel (see the display check above), set browser zoom to 100%, brightness to full, and turn off True Tone and Night Shift (System Settings › Displays) so red and cyan stay pure.</li>
+<li><strong>Seat the participant 50 cm from the screen</strong>, eyes level with its centre, and put the glasses on with the <span id="lensText">red lens over the left eye</span>.</li>
+<li><strong>Tell them the answer options:</strong> circle, triangle, star, heart, cross, or nothing. Give them as long as they need on each image.</li>
+<li><strong>Run the practice, then the test.</strong> Type the key for what they say; the screen gives no feedback in the test. Then run the control without glasses. A stopped block can be resumed where it stopped.</li>
+</ol></section>
+<section class="panel" id="inspector"><h2 class="section-title">Inspect a stimulus</h2>
+<div class="row" style="grid-template-columns:1fr 1fr 1fr auto;align-items:end"><div class="field"><label for="inspectShape">Shape</label><select id="inspectShape"></select></div><div class="field"><label for="inspectDisparity">Disparity</label><div class="input-wrap"><input class="unit" id="inspectDisparity" type="number" min="0" max="40" step="1" value="10"><span>px</span></div></div><div class="field"><label for="inspectSeed">Dot seed</label><input id="inspectSeed" type="text" value="example" maxlength="60" spellcheck="false"></div><div class="field"><button class="secondary" type="button" id="fullSize">View 1:1</button></div></div>
+<div class="views"><figure><canvas id="viewMask"></canvas><figcaption>1 · Shape (black and white)</figcaption></figure><figure><canvas id="viewLeft"></canvas><figcaption>2 · Random dot pattern (black and white)</figcaption></figure><figure><canvas id="viewLeftColour"></canvas><figcaption>3 · Left-eye image</figcaption></figure><figure><canvas id="viewRightColour"></canvas><figcaption>4 · Right-eye image</figcaption></figure><figure><canvas id="viewAnaglyph"></canvas><figcaption>5 · Combined stereogram</figcaption></figure></div>
+<p class="specs" id="inspectSpecs"></p>
+<details style="margin-top:16px"><summary>Answer key (experimenter only)</summary><div id="answerKey"></div></details></section>
+<section class="panel" id="results"><div class="result-head"><h2 class="section-title">Results</h2><div class="buttons"><button class="secondary" type="button" id="downloadCsv">Download CSV</button><button class="secondary" type="button" id="clearResults">Clear results</button></div></div><div id="resultBody"></div></section>
+</div>
+</div>
+</main>
+<footer>Everything runs in your browser. Responses are kept on this device, per seed and participant, until you clear them.</footer>
+<div id="stage" hidden><canvas id="stimulus"></canvas><p id="prompt"></p><p id="legend"></p></div>
+<script src="rds.js"></script>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const MARGIN = 32;
+const KEYS = {1: 'circle', 2: 'triangle', 3: 'star', 4: 'heart', 5: 'cross', 0: 'none'};
+const FIELDS = {participant: 'p', diagonal: 'diag', nativeWidth: 'nw', nativeHeight: 'nh', distance: 'dist', measured: 'bar', measuredAt: 'barat', redEye: 'eye', background: 'bg', width: 'w', height: 'h', diameter: 'd', covered: 'cov', size: 'size', levels: 'lv', reps: 'reps', catchTrials: 'ct', controlReps: 'cr', controlCatch: 'cc', seed: 's'};
+const TEXT_FIELDS = ['participant', 'measured', 'measuredAt', 'redEye', 'background', 'levels', 'seed'];
+const CONDITION_NAMES = {practice: 'Practice', glasses: 'Test with glasses', control: 'Control without glasses'};
+const MODIFIERS = ['Meta', 'Shift', 'Control', 'Alt', 'CapsLock'];
+const ANSWER_KEYS = '1 circle · 2 triangle · 3 star · 4 heart · 5 cross · 0 nothing';
+let settings, geometry, run = null, loadedKey = null;
+let results = {glasses: [], control: [], meta: {}};
+
+function readSettings() {
+  const s = {};
+  for (const id of Object.keys(FIELDS)) {
+    const input = $(id);
+    input.removeAttribute('aria-invalid');
+    if (TEXT_FIELDS.includes(id)) { s[id] = input.value.trim(); continue; }
+    if (!input.checkValidity() || input.value === '') { input.setAttribute('aria-invalid', 'true'); throw new Error(`${input.labels[0].textContent}: ${input.validationMessage || `enter a value between ${input.min} and ${input.max}.`}`); }
+    s[id] = Number(input.value);
+  }
+  const levels = s.levels.split(/[\s,]+/).filter(Boolean).map(Number);
+  if (!levels.length || levels.some(v => !Number.isInteger(v) || v < 1)) { $('levels').setAttribute('aria-invalid', 'true'); throw new Error('Disparities must be whole numbers of pixels, at least 1.'); }
+  s.levels = [...new Set(levels)].sort((a, b) => a - b);
+  if (s.measured !== '' && !(Number(s.measured) > 0 && Number(s.measured) < 50)) { $('measured').setAttribute('aria-invalid', 'true'); throw new Error('Enter the measured bar length in centimetres.'); }
+  if (s.levels.at(-1) / 2 + s.diameter > MARGIN) { $('levels').setAttribute('aria-invalid', 'true'); throw new Error(`Half the largest disparity plus the dot diameter must be at most ${MARGIN} px.`); }
+  if (!s.seed) throw new Error('Enter a session seed.');
+  return s;
+}
+
+// Physical size and visual angle of one image pixel, and whether image pixels map 1:1 onto screen pixels.
+function measureGeometry(s) {
+  const dpr = devicePixelRatio, deviceWidth = Math.round(screen.width * dpr), deviceHeight = Math.round(screen.height * dpr);
+  const oneToOne = deviceWidth === s.nativeWidth && deviceHeight === s.nativeHeight;
+  // A display mode that could be 1:1 (native = whole multiple of screen size) but isn't means browser zoom.
+  const modeScale = s.nativeWidth / screen.width;
+  const zoomed = !oneToOne && (!Number.isInteger(dpr) || (Number.isInteger(modeScale) && screen.height * modeScale === s.nativeHeight));
+  const nominal = RDS.pixelPitchCm(s.diagonal, s.nativeWidth, s.nativeHeight) * s.nativeWidth / deviceWidth;
+  const screenSize = `${deviceWidth}x${deviceHeight}`;
+  const measuredHere = s.measured !== '' && s.measuredAt === screenSize;
+  const pitch = measuredHere ? Number(s.measured) / 1000 : nominal;
+  return {dpr, deviceWidth, deviceHeight, screenSize, oneToOne, zoomed, nominal, measuredHere, pitch, arcsec: px => RDS.visualAngle(px * pitch, s.distance)};
+}
+
+const fmt = (value, digits = 0) => value.toLocaleString(undefined, {minimumFractionDigits: digits, maximumFractionDigits: digits});
+const formatP = p => p < 0.001 ? 'p < 0.001' : `p = ${p.toFixed(3)}`;
+const storageKey = s => `rds-experiment:${s.seed}:${s.participant}`;
+
+function update() {
+  try { settings = readSettings(); $('error').textContent = ''; }
+  catch (error) { $('error').textContent = error.message; return false; }
+  geometry = measureGeometry(settings);
+  const s = settings, g = geometry;
+  if (storageKey(s) !== loadedKey) loadResults();
+  const status = $('displayStatus');
+  status.classList.toggle('bad', !g.oneToOne);
+  status.innerHTML = g.oneToOne
+    ? `<strong>1:1 — each image pixel is one screen pixel.</strong>The browser draws ${g.deviceWidth} × ${g.deviceHeight} pixels, matching the ${s.nativeWidth} × ${s.nativeHeight} panel.`
+    : g.zoomed
+      ? `<strong>Browser zoom is not 100%.</strong>The page is zoomed (devicePixelRatio ${fmt(g.dpr, 2)}), so the sizes below are wrong. Press ⌘0 (Ctrl+0), then reload this page.`
+      : `<strong>Not 1:1 — the screen is being rescaled.</strong>The browser draws ${g.deviceWidth} × ${g.deviceHeight} pixels but the panel has ${s.nativeWidth} × ${s.nativeHeight}, so every image is resampled and small disparities get blurred. On a Mac open System Settings › Displays, show all resolutions, and pick ${s.nativeWidth / 2} × ${s.nativeHeight / 2}; set browser zoom to 100%. Then reload this page.`;
+  if (!P3 && matchMedia('(color-gamut: p3)').matches) status.innerHTML += `<br><strong style="margin-top:8px">This browser can't draw in the screen's P3 colours.</strong>Cyan dots will leak into the red lens. Use a current Chrome or Safari.`;
+  $('bar').style.width = `${1000 / g.dpr}px`;
+  const expected = 1000 * g.nominal;
+  let barText = `This bar is 1,000 image pixels and should measure ${fmt(expected, 2)} cm. If your ruler says otherwise, enter what you measure and it will be used instead.`;
+  if (s.measured !== '' && !g.measuredHere) barText += ` <span style="color:var(--warn)">The ${s.measured} cm measurement was taken with the screen at ${s.measuredAt || 'another setting'}, not ${g.screenSize}, so it is ignored. Measure again.</span>`;
+  else if (g.measuredHere && Math.abs(Number(s.measured) - expected) / expected > 0.03) barText += ` <span style="color:var(--warn)">Your ${s.measured} cm is ${fmt(100 * Math.abs(Number(s.measured) - expected) / expected)}% off the expected length: check the diagonal above and the measurement.</span>`;
+  $('barHint').innerHTML = barText;
+  $('levelTable').tBodies[0].innerHTML = s.levels.map(px => `<tr><td>${px} px</td><td>${fmt(g.arcsec(px))}</td><td>${fmt(g.arcsec(px) / 60, 1)}</td></tr>`).join('');
+  const out = s.levels.filter(px => g.arcsec(px) < 40 || g.arcsec(px) > 1000).length;
+  $('geometry').innerHTML = `One pixel is ${fmt(g.pitch * 10, 4)} mm and subtends <strong>${fmt(g.arcsec(1), 1)} arcsec</strong> at ${s.distance} cm${g.measuredHere ? ' (from your ruler measurement)' : ''}. The stimulus is ${s.width} × ${s.height} px (${fmt(s.width * g.pitch, 1)} × ${fmt(s.height * g.pitch, 1)} cm, ${fmt(g.arcsec(s.width) / 3600, 1)}° × ${fmt(g.arcsec(s.height) / 3600, 1)}°) and each dot ${fmt(g.arcsec(s.diameter))} arcsec.`
+    + (s.levels.length < 10 ? ' <span style="color:var(--warn)">The extra credit asks for at least 10 disparity levels.</span>' : '')
+    + (out ? ` <span style="color:var(--warn)">${out} level${out > 1 ? 's are' : ' is'} outside 40–1000 arcsec.</span>` : '');
+  const testTrials = s.levels.length * s.reps + s.catchTrials, controlTrials = s.levels.length * s.controlReps + s.controlCatch;
+  $('trialCount').textContent = `Test: ${testTrials} trials (${s.levels.length} disparities × ${s.reps} + ${s.catchTrials} with no shape). Control: ${controlTrials} trials. Each trial has its own dot pattern and a random shape; the order is shuffled.`;
+  $('lensText').textContent = `red lens over the ${s.redEye} eye`;
+  history.replaceState(null, '', '#' + new URLSearchParams(Object.entries(FIELDS).map(([id, key]) => [key, $(id).value.trim()])));
+  renderAnswerKey();
+  renderInspector();
+  renderResults();
+  return true;
+}
+
+function applyHash() {
+  const params = new URLSearchParams(location.hash.slice(1));
+  for (const [id, key] of Object.entries(FIELDS)) if (params.has(key)) $(id).value = params.get(key);
+}
+
+const planFor = condition => {
+  const s = settings;
+  if (condition === 'practice') return {levels: s.levels.slice(-3), reps: 1, catchTrials: 1};
+  if (condition === 'control') return {levels: s.levels, reps: s.controlReps, catchTrials: s.controlCatch};
+  return {levels: s.levels, reps: s.reps, catchTrials: s.catchTrials};
+};
+const trialsFor = (condition, plan = planFor(condition)) => RDS.buildTrials({seed: settings.seed, condition, ...plan});
+
+// Everything that changes what a block shows or how it is scored; a saved block resumes only if this matches.
+const fingerprint = condition => JSON.stringify({plan: planFor(condition), width: settings.width, height: settings.height, diameter: settings.diameter, covered: settings.covered, size: settings.size, redEye: settings.redEye, background: settings.background, distance: settings.distance, pitch: Math.round(geometry.pitch * 1e6)});
+
+const stimulusFor = trial => RDS.stereogram({width: settings.width, height: settings.height, margin: MARGIN, diameter: settings.diameter, covered: settings.covered / 100, disparity: trial.disparity, offset: trial.offset || 0, shape: trial.shape, size: settings.size, seed: trial.seed});
+
+// Pixels are written in the panel's own Display P3 space where the browser allows it, so pure red and
+// pure cyan reach the screen unchanged; drawn as sRGB, a P3 Mac lights the red sub-pixel under cyan dots.
+const P3 = (() => { try { return document.createElement('canvas').getContext('2d', {colorSpace: 'display-p3'}).getContextAttributes().colorSpace === 'display-p3'; } catch { return false; } })();
+const COLOR_SPACE = P3 ? 'display-p3' : 'srgb';
+function paint(canvas, rgba, width, height) {
+  canvas.width = width; canvas.height = height;
+  canvas.getContext('2d', {colorSpace: COLOR_SPACE}).putImageData(new ImageData(rgba, width, height, {colorSpace: COLOR_SPACE}), 0, 0);
+}
+
+const inspectedTrial = () => ({shape: $('inspectShape').value, disparity: Number($('inspectDisparity').value) || 0, seed: $('inspectSeed').value || 'example'});
+
+function renderInspector() {
+  const trial = inspectedTrial();
+  let st;
+  try { st = stimulusFor(trial); } catch (error) { $('inspectSpecs').textContent = error.message; return; }
+  paint($('viewMask'), RDS.grayscale(st.mask, st.width, st.height), st.width, st.height);
+  paint($('viewLeft'), RDS.grayscale(st.left, st.width, st.height), st.width, st.height);
+  paint($('viewLeftColour'), RDS.eyeImage(st, 'left', settings), st.width, st.height);
+  paint($('viewRightColour'), RDS.eyeImage(st, 'right', settings), st.width, st.height);
+  paint($('viewAnaglyph'), RDS.anaglyph(st, settings), st.width, st.height);
+  const link = (url, text) => url ? `<a href="${url.replace(/^https:\/\/kefangpsych\.github\.io\/random-dot-generator\//, 'index.html')}" target="_blank" rel="noopener">${text}</a>` : `${text} (too large for Dot studio)`;
+  const moves = trial.shape === 'none' ? `right-eye field moved ${-st.backgroundShift} px right` : `right eye: shape moved ${st.shapeShift} px left, background ${-st.backgroundShift} px right`;
+  $('inspectSpecs').innerHTML = `${trial.shape} · ${trial.disparity} px = ${fmt(geometry.arcsec(trial.disparity))} arcsec · ${moves} · ${st.count.toLocaleString()} dots of ${settings.diameter} px on a ${st.fieldWidth} × ${st.height} field · seed “${trial.seed}” · ${link(st.links.base, 'base dots in Dot studio')} · ${link(st.links.fill, 'fill dots in Dot studio')}`;
+}
+
+function renderAnswerKey() {
+  $('answerKey').innerHTML = ['glasses', 'control'].map(condition => `<p style="margin:12px 0 0"><strong>${CONDITION_NAMES[condition]}</strong></p><div class="key-list">${trialsFor(condition).map(t => `${t.trial}. ${t.shape === 'none' ? 'no shape' : `${t.shape} · ${t.disparity} px`}`).join('<br>')}</div>`).join('');
+}
+
+// Stage: the stimulus is drawn at its native pixel size, on whole CSS pixels so nothing is resampled.
+function showStage() {
+  const stage = $('stage');
+  stage.hidden = false;
+  stage.classList.toggle('white', settings.background === 'white');
+  document.activeElement?.blur();
+  if (stage.requestFullscreen && !document.fullscreenElement) stage.requestFullscreen().catch(() => {});
+}
+
+function hideStage() {
+  $('stage').hidden = true;
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+}
+
+function positionStimulus() {
+  const canvas = $('stimulus'), cssWidth = canvas.width / devicePixelRatio, cssHeight = canvas.height / devicePixelRatio;
+  Object.assign(canvas.style, {width: `${cssWidth}px`, height: `${cssHeight}px`, left: `${Math.floor((innerWidth - cssWidth) / 2)}px`, top: `${Math.floor((innerHeight - cssHeight) / 2)}px`});
+}
+
+function placeStimulus(st) {
+  paint($('stimulus'), RDS.anaglyph(st, settings), st.width, st.height);
+  positionStimulus();
+  $('stimulus').hidden = false;
+}
+
+function showPrompt(text, legend = '') {
+  $('stimulus').hidden = true;
+  $('stage').classList.remove('stimulus');
+  $('prompt').textContent = text;
+  $('legend').textContent = legend;
+}
+
+function startRun(condition) {
+  if (!update()) return;
+  const s = settings, g = geometry;
+  if (s.width / g.dpr > screen.width || s.height / g.dpr > screen.height - 60) { $('error').textContent = 'The stimulus is larger than the screen. Make it smaller.'; return; }
+  if (condition !== 'practice' && !g.oneToOne && !confirm(`The display is not 1:1 (the browser draws ${g.deviceWidth} × ${g.deviceHeight}, the panel has ${s.nativeWidth} × ${s.nativeHeight}), so disparities will be resampled and the arcsec values are off. Run anyway?`)) return;
+  const trials = trialsFor(condition);
+  let responses = [];
+  if (condition !== 'practice' && results[condition].length) {
+    const saved = results[condition];
+    const sameSetup = results.meta[condition]?.fingerprint === fingerprint(condition) && saved.every((r, i) => trials[i] && r.seed === trials[i].seed && r.shape === trials[i].shape && r.disparity === trials[i].disparity);
+    if (sameSetup && saved.length < trials.length && confirm(`${saved.length} of ${trials.length} trials of “${CONDITION_NAMES[condition]}” are done. Resume at trial ${saved.length + 1}? (Cancel to start over.)`)) responses = [...saved];
+    else if (!confirm(`${sameSetup ? '' : 'The settings have changed since these responses were collected, so the block cannot be resumed. '}Start “${CONDITION_NAMES[condition]}” again and delete the ${saved.length} saved responses?`)) return;
+  }
+  if (condition !== 'practice') results.meta[condition] = {plan: planFor(condition), fingerprint: fingerprint(condition)};
+  run = {condition, trials, index: responses.length, responses, phase: 'ready', feedback: '', stopArmed: false,
+    snapshot: {red_eye: s.redEye, background: s.background, distance_cm: s.distance, pixel_mm: Math.round(g.pitch * 1e5) / 1e4, arcsec_per_px: Math.round(g.arcsec(1) * 100) / 100, screen_px: g.screenSize, dpr: g.dpr, one_to_one: g.oneToOne, color_space: COLOR_SPACE, dot_px: s.diameter, coverage_pct: s.covered, shape_size_px: s.size}};
+  saveRun();
+  showStage();
+  showReady();
+}
+
+function showReady() {
+  const {condition, trials, index, feedback} = run;
+  const glasses = condition === 'control' ? 'NO GLASSES — take them off.' : `Glasses on: red lens over the ${settings.redEye} eye.`;
+  showPrompt(`${feedback}${feedback ? '\n\n' : ''}${CONDITION_NAMES[condition]} · trial ${index + 1} of ${trials.length}\n${glasses}\n\nPress Space to show the image.`, 'Backspace: redo previous trial  ·  Q twice: stop');
+  run.phase = 'ready';
+}
+
+function showDone() {
+  showPrompt(`${run.feedback}${run.feedback ? '\n\n' : ''}${CONDITION_NAMES[run.condition]} finished.\n\nPress Space to see the results.`, 'Backspace: redo the last trial');
+  run.phase = 'done';
+}
+
+function showStimulus() {
+  const trial = run.trials[run.index];
+  placeStimulus(stimulusFor(trial));
+  $('prompt').textContent = '';
+  $('legend').textContent = `Answer: ${ANSWER_KEYS}`;
+  $('legend').classList.remove('nudge');
+  $('stage').classList.add('stimulus');
+  run.phase = 'stimulus';
+  run.shownAt = performance.now();
+}
+
+function respond(response) {
+  const trial = run.trials[run.index];
+  const record = {
+    participant: settings.participant, condition: trial.condition, trial: trial.trial, shape: trial.shape,
+    disparity: trial.disparity, arcsec: Math.round(geometry.arcsec(trial.disparity) * 100) / 100, offset: trial.offset,
+    response, correct: response === trial.shape, rt: Math.round(performance.now() - run.shownAt),
+    seed: trial.seed, time: new Date().toISOString(), ...run.snapshot,
+  };
+  run.responses.push(record);
+  run.feedback = run.condition === 'practice' ? `${record.correct ? 'Correct' : 'Not quite'} — that was ${trial.shape === 'none' ? 'no shape' : `a ${trial.shape}`} at ${trial.disparity} px.` : '';
+  run.index++;
+  saveRun();
+  if (run.index >= run.trials.length) showDone(); else showReady();
+}
+
+function undo() {
+  if (!run.index) return;
+  run.index--; run.responses.pop(); run.feedback = `Trial ${run.index + 1} will be shown again.`;
+  saveRun();
+  showReady();
+}
+
+function saveRun() {
+  if (run.condition === 'practice') return;
+  results[run.condition] = [...run.responses];
+  try { localStorage.setItem(loadedKey, JSON.stringify(results)); } catch {}
+}
+
+function finishRun() {
+  const done = run;
+  run = null;
+  hideStage();
+  renderResults();
+  if (done.condition !== 'practice') $('results').scrollIntoView({behavior: 'smooth'});
+}
+
+function loadResults() {
+  loadedKey = storageKey(settings);
+  try { results = {glasses: [], control: [], meta: {}, ...JSON.parse(localStorage.getItem(loadedKey) || '{}')}; }
+  catch { results = {glasses: [], control: [], meta: {}}; }
+}
+
+function plot(series) {
+  const W = 520, H = 230, L = 44, R = 12, T = 12, B = 38, min = Math.log10(30), max = Math.log10(1200);
+  const x = a => L + (Math.log10(Math.max(30, Math.min(1200, a))) - min) / (max - min) * (W - L - R), y = p => T + (1 - p) * (H - T - B);
+  const ticks = [50, 100, 200, 500, 1000].map(a => `<line x1="${x(a)}" x2="${x(a)}" y1="${T}" y2="${H - B}" stroke="#eef1e9"/><text x="${x(a)}" y="${H - B + 16}" text-anchor="middle">${a}</text>`).join('');
+  const yTicks = [0, .5, 1].map(p => `<line x1="${L}" x2="${W - R}" y1="${y(p)}" y2="${y(p)}" stroke="#eef1e9"/><text x="${L - 8}" y="${y(p) + 4}" text-anchor="end">${p * 100}%</text>`).join('');
+  const lines = series.map(({levels, color, threshold}) => {
+    const points = levels.map(l => [x(l.arcsec), y(l.correct / l.n)]);
+    return `<polyline fill="none" stroke="${color}" stroke-width="2" points="${points.map(p => p.join(',')).join(' ')}"/>${points.map(([px, py]) => `<circle cx="${px}" cy="${py}" r="4" fill="${color}"/>`).join('')}`
+      + (threshold ? `<line x1="${x(threshold.arcsec)}" x2="${x(threshold.arcsec)}" y1="${T}" y2="${H - B}" stroke="${color}" stroke-dasharray="4 4"/>` : '');
+  }).join('');
+  return `<svg class="plot" viewBox="0 0 ${W} ${H}" role="img" aria-label="Percent of shapes identified by disparity" font-size="11" fill="#68766d">${ticks}${yTicks}<line x1="${L}" x2="${W - R}" y1="${y(.2)}" y2="${y(.2)}" stroke="#c9d3c2" stroke-dasharray="2 3"/><text x="${L + 6}" y="${y(.2) - 4}">guessing</text>${lines}<text x="${(L + W - R) / 2}" y="${H - 4}" text-anchor="middle">Disparity (arcsec, log scale) · green: glasses · grey: no glasses</text></svg>`;
+}
+
+// The control block's score at one disparity, to report next to the threshold.
+function controlAt(disparity) {
+  const rows = results.control.filter(r => r.disparity === disparity);
+  return rows.length ? ` Without glasses at ${disparity} px: ${rows.filter(r => r.correct).length} of ${rows.length} correct.` : '';
+}
+
+function renderResults() {
+  const blocks = [], series = [];
+  for (const [condition, color] of [['glasses', '#2b634b'], ['control', '#a0a89c']]) {
+    const data = results[condition];
+    if (!data.length) continue;
+    const meta = results.meta[condition], plan = meta?.plan || planFor(condition);
+    const planned = trialsFor(condition, plan), summary = RDS.summarize(data, planned);
+    const reps = plan.reps, need = Math.ceil(2 / 3 * reps - 1e-9);
+    const shown = summary.levels.filter(l => l.disparity > 0 && l.n);
+    series.push({levels: shown, color, threshold: condition === 'glasses' ? summary.threshold : null});
+    const vsChance = `Shapes named correctly on ${summary.shapeCorrect} of ${summary.shapeTrials} shape trials (${fmt(summary.shapeTrials ? 100 * summary.shapeCorrect / summary.shapeTrials : 0)}%); guessing would give about ${fmt(100 * summary.chance)}% (one-sided binomial ${formatP(summary.p)}).`;
+    const catchText = summary.catch && summary.catch.n ? ` Said they saw a shape on ${summary.catch.saw} of ${summary.catch.n} no-shape trials.` : '';
+    // Any leak without glasses would show first at the smallest disparities, so test those on their own too.
+    const smallest = shown.slice(0, 3), smallN = smallest.reduce((sum, l) => sum + l.n, 0), smallCorrect = smallest.reduce((sum, l) => sum + l.correct, 0);
+    const smallP = smallN ? RDS.binomialTail(smallCorrect, smallN, summary.chance) : 1;
+    const smallText = smallest.length ? ` At the ${smallest.length} smallest disparities (${smallest[0].disparity}–${smallest.at(-1).disparity} px): ${smallCorrect} of ${smallN} correct (${formatP(smallP)}).` : '';
+    let verdict;
+    if (condition === 'control') verdict = `${summary.complete ? '' : `<strong class="bad">Incomplete (${data.length} of ${planned.length} trials).</strong> `}${vsChance}${smallText}${catchText} ${summary.p < .05 || smallP < .05 ? '<strong class="bad">Above chance without glasses: check that the glasses were off, and treat the levels they got right as possibly visible without glasses.</strong>' : summary.complete ? 'Not above chance: no sign the shapes could be seen without glasses.' : ''}`;
+    else if (!summary.complete) verdict = `<strong class="bad">Incomplete (${data.length} of ${planned.length} trials)</strong> — resume the block to get a threshold. ${vsChance}${catchText}`;
+    else if (summary.threshold) {
+      const lowest = summary.threshold === shown[0];
+      verdict = `Threshold: <strong>${lowest ? '≤ ' : ''}${summary.threshold.disparity} px (${lowest ? '≤ ' : ''}${fmt(summary.threshold.arcsec, 1)} arcsec)</strong>, the smallest disparity from which every larger one was identified on at least ${need} of ${reps} trials${lowest ? ' (this is the smallest level tested, so the true threshold may be lower)' : ''}. ${vsChance}${catchText}${controlAt(summary.threshold.disparity)}`;
+    } else verdict = `No threshold: the largest disparity was identified on fewer than ${need} of ${reps} trials. ${vsChance}${catchText}`;
+    if (data.some(r => r.one_to_one === false)) verdict += ' <strong class="bad">Some trials ran with the display not 1:1.</strong>';
+    if (meta && meta.fingerprint !== fingerprint(condition)) verdict += ' <strong class="bad">Collected with different settings from the ones in the form now; it is scored against the settings it was collected with.</strong>';
+    const rows = summary.levels.map(l => `<tr><td>${l.disparity ? `${l.disparity} px` : 'no shape'}</td><td>${l.disparity && l.n ? fmt(l.arcsec, 1) : '—'}</td><td>${l.correct} / ${l.n}${l.n < l.planned ? ` <span class="hint">(of ${l.planned})</span>` : ''}</td><td>${l.n ? `${fmt(100 * l.correct / l.n)}%` : '—'}</td><td>${l.saw} / ${l.n}</td></tr>`).join('');
+    const who = data[0].participant ? ` · ${data[0].participant.replace(/[<&>"]/g, '')}` : '';
+    blocks.push(`<h3 style="font-size:15px;margin:18px 0 0">${CONDITION_NAMES[condition]}${who} <span class="hint">· ${data.length} of ${planned.length} trials</span></h3><p class="verdict">${verdict}</p><table><thead><tr><th>Disparity</th><th>arcsec</th><th>Correct</th><th>%</th><th>Said a shape</th></tr></thead><tbody>${rows}</tbody></table>`);
+  }
+  $('resultBody').innerHTML = blocks.length ? plot(series) + blocks.join('') : '<p class="empty">No responses yet. Results appear here after a test or control run.</p>';
+}
+
+function downloadCsv() {
+  if (!update()) return;
+  const rows = [...results.glasses, ...results.control];
+  if (!rows.length) return;
+  const columns = ['participant', 'condition', 'trial', 'shape', 'disparity', 'arcsec', 'offset', 'response', 'correct', 'rt', 'seed', 'time', 'red_eye', 'background', 'distance_cm', 'pixel_mm', 'arcsec_per_px', 'screen_px', 'dpr', 'one_to_one', 'color_space', 'dot_px', 'coverage_pct', 'shape_size_px'];
+  const csv = [columns.join(','), ...rows.map(r => columns.map(c => JSON.stringify(r[c] ?? '')).join(','))].join('\n');
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(new Blob([csv], {type: 'text/csv'}));
+  link.download = `stereo-test_${settings.participant || 'participant'}_seed-${settings.seed}.csv`;
+  document.body.append(link); link.click(); link.remove();
+}
+
+document.addEventListener('keydown', event => {
+  if ($('stage').hidden || MODIFIERS.includes(event.key) || event.metaKey || event.ctrlKey || event.altKey) return;
+  event.preventDefault();
+  if (event.repeat) return;
+  const key = event.key.toLowerCase();
+  if (!run) { if (key === 'escape' || key === ' ' || key === 'enter') hideStage(); return; }
+  if (key === 'q' || key === 'escape') {
+    if (run.stopArmed) { finishRun(); return; }
+    run.stopArmed = true;
+    $('legend').textContent = 'Press Q again to stop. Responses so far are kept and the block can be resumed.';
+    return;
+  }
+  if (run.stopArmed) { run.stopArmed = false; if (run.phase === 'ready') showReady(); else if (run.phase === 'done') showDone(); else $('legend').textContent = `Answer: ${ANSWER_KEYS}`; }
+  if (run.phase === 'ready' && key === ' ') showStimulus();
+  else if (run.phase === 'done' && key === ' ') finishRun();
+  else if ((run.phase === 'ready' || run.phase === 'done') && key === 'backspace') undo();
+  else if (run.phase === 'stimulus' && key in KEYS) respond(KEYS[key]);
+  else if (run.phase === 'stimulus' && (key === ' ' || key === 'enter')) { $('legend').textContent = `Type their answer first: ${ANSWER_KEYS}`; $('legend').classList.add('nudge'); }
+});
+$('stage').addEventListener('click', () => { if (!run) hideStage(); });
+
+$('inspectShape').innerHTML = [...RDS.SHAPES, 'none'].map(s => `<option value="${s}">${s === 'none' ? 'no shape' : s}</option>`).join('');
+$('inspectShape').value = 'heart';
+$('setup').addEventListener('input', update);
+$('setup').addEventListener('submit', event => event.preventDefault());
+$('measured').addEventListener('input', () => { $('measuredAt').value = `${Math.round(screen.width * devicePixelRatio)}x${Math.round(screen.height * devicePixelRatio)}`; update(); });
+for (const id of ['inspectShape', 'inspectDisparity', 'inspectSeed']) $(id).addEventListener('input', renderInspector);
+$('fullSize').addEventListener('click', () => {
+  if (!update()) return;
+  showStage();
+  showPrompt('', 'Press Esc or Space, or click, to close');
+  placeStimulus(stimulusFor(inspectedTrial()));
+});
+$('runPractice').addEventListener('click', () => startRun('practice'));
+$('runGlasses').addEventListener('click', () => startRun('glasses'));
+$('runControl').addEventListener('click', () => startRun('control'));
+$('downloadCsv').addEventListener('click', downloadCsv);
+$('clearResults').addEventListener('click', () => {
+  if (!update()) return;
+  if (!confirm(`Delete all saved responses for participant “${settings.participant || '(none)'}” with seed “${settings.seed}”?`)) return;
+  results = {glasses: [], control: [], meta: {}};
+  try { localStorage.removeItem(loadedKey); } catch {}
+  renderResults();
+});
+for (const type of ['resize', 'fullscreenchange']) window.addEventListener(type, () => { if (!$('stage').hidden && !$('stimulus').hidden) positionStimulus(); });
+
+applyHash();
+update();
+</script>
+</body>
+</html>

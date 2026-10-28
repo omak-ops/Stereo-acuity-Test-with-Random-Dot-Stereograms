@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Create and download random circular dot images. Adjust dimensions, dot count or coverage, size, color, opacity, background, and seed. Works offline.">
+<title>Dot studio — Random dot generator</title>
+<style>
+:root{color-scheme:light;--ink:#23392f;--muted:#68766d;--line:#dde2d8;--paper:#fafbf6;--green:#2b634b;--mint:#e5efdc}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #91b77c;outline-offset:3px}header{max-width:1440px;margin:auto;padding:27px 40px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:20px}.brand{display:flex;align-items:center;gap:13px;font-size:21px;font-weight:700;letter-spacing:-.7px}.mark{display:grid;grid-template-columns:repeat(3,5px);gap:4px;transform:rotate(-12deg)}.mark i{width:5px;height:5px;border-radius:50%;background:var(--green)}.mark i:nth-child(3n){opacity:.4}.tag{font-size:12px;color:var(--muted);letter-spacing:.02em}main{max-width:1440px;margin:auto;padding:37px 40px 26px}.intro{margin-bottom:29px}.eyebrow{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--green);font-weight:700}h1{font-size:clamp(29px,3vw,40px);font-weight:600;line-height:1.2;letter-spacing:-1.6px;margin:9px 0 10px}.intro p{margin:0;color:var(--muted)}.workspace{display:grid;grid-template-columns:310px minmax(0,1fr);gap:24px}.controls{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;align-self:start}.section-title{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--muted);margin:0 0 16px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{margin-bottom:20px}label,.label{display:block;font-size:13px;font-weight:600;margin-bottom:7px}.input-wrap{position:relative}.input-wrap span{position:absolute;right:12px;top:10px;font-size:12px;color:var(--muted);pointer-events:none}input[type=number],input[type=text]{width:100%;height:42px;border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:#fcfdf9;color:var(--ink);min-width:0}input.unit{padding-right:35px}input[type=range]{display:block;width:100%;margin:13px 0 0;accent-color:var(--green);cursor:pointer}input[aria-invalid=true]{border-color:#c4554c;background:#fff6f4}.rule{height:1px;background:var(--line);margin:1px 0 20px}.hint{font-size:12px;color:var(--muted);margin:7px 0 0;line-height:1.6}.seed-label{display:flex;justify-content:space-between;align-items:center}.seed-label span{font-weight:400;font-size:11px;color:var(--muted)}
+input[type=color]{width:42px;height:42px;padding:3px;border:1px solid var(--line);border-radius:8px;background:#fcfdf9;cursor:pointer}input[type=color]::-webkit-color-swatch-wrapper{padding:0}input[type=color]::-webkit-color-swatch{border:0;border-radius:5px}input[type=color]::-moz-color-swatch{border:0;border-radius:5px}input.hex{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;text-transform:lowercase}.check{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:400;margin:10px 0 0;cursor:pointer}.check input{accent-color:var(--green);width:16px;height:16px;margin:0}.bg-row{display:grid;grid-template-columns:42px minmax(0,1fr);gap:8px}.bg-row.off{opacity:.45;pointer-events:none}.seg{display:grid;grid-template-columns:1fr 1fr;background:#f1f4ec;border:1px solid var(--line);border-radius:9px;padding:3px;margin-bottom:12px}.seg label{margin:0;cursor:pointer}.seg input{position:absolute;opacity:0;pointer-events:none}.seg span{display:block;text-align:center;font-size:12px;font-weight:600;color:var(--muted);padding:6px 4px;border-radius:6px}.seg input:checked+span{background:#fff;color:var(--ink);box-shadow:0 1px 3px #23392f1f}.seg input:focus-visible+span{outline:3px solid #91b77c}input[readonly]{background:#f1f4ec;color:var(--muted)}.value{float:right;font-weight:400;color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.primary,.secondary{border-radius:9px;padding:11px 15px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s}.primary{background:var(--green);color:#fff;border:1px solid var(--green)}.primary:hover{background:#214d3a}.secondary{background:#fff;color:var(--ink);border:1px solid var(--line)}.secondary:hover{background:#f2f5ec}.controls .primary{width:100%;margin-top:2px}.reset{border:0;background:transparent;color:var(--muted);font-size:12px;text-decoration:underline;text-underline-offset:3px;display:block;margin:14px auto 0;padding:4px}.preview{min-width:0;background:#eef1e9;border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;align-self:start;position:sticky;top:16px}.preview-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line);background:#f6f8f1;flex-wrap:wrap}.preview-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}.live{width:6px;height:6px;background:#6b9860;border-radius:50%}.actions{display:flex;gap:8px}.preview-bar .secondary{padding:8px 12px;font-size:12px}.canvas-wrap{flex:1;min-height:330px;display:flex;align-items:center;justify-content:center;padding:25px;background-image:radial-gradient(#dce1d5 .7px,transparent .7px);background-size:12px 12px}.canvas-wrap canvas{display:block;max-width:100%;max-height:65vh;width:auto;height:auto;box-shadow:0 4px 22px #23392f10;background:#fff}.canvas-wrap canvas.transparent{background:repeating-conic-gradient(#e4e7e0 0 25%,#fff 0 50%) 0 0/16px 16px}.preview-footer{background:#f6f8f1;border-top:1px solid var(--line);padding:13px 20px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums}.pill{color:var(--green);font-size:11px;background:var(--mint);border-radius:20px;padding:4px 9px;display:inline-block;white-space:nowrap}.details{display:flex;gap:13px;align-items:flex-start;margin-top:21px;color:var(--muted);font-size:12px;max-width:800px}.details p{margin:0}.details strong{color:var(--ink);font-weight:600}.error{font-size:12px;color:#a33028;min-height:0;margin:10px 0 0}.error:empty{display:none}.toast{font-size:12px;color:var(--green)}footer{max-width:1440px;margin:0 auto;padding:0 40px 25px;color:#839083;font-size:11px}svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.7;flex-shrink:0}@media(min-width:1600px){.canvas-wrap canvas{max-height:720px}}@media(max-width:800px){header{padding:20px 22px}main{padding:25px 22px}.workspace{grid-template-columns:260px minmax(0,1fr);gap:16px}.controls{padding:18px}.canvas-wrap{padding:16px;min-height:220px}.preview-bar{padding:13px}.preview-footer{padding:12px}footer{padding:0 22px 22px}}@media(max-width:620px){.tag{display:none}.workspace{display:flex;flex-direction:column-reverse}.controls{width:100%}.preview{min-height:300px;position:static}.canvas-wrap canvas{max-height:55vh}.intro p{font-size:13px}.details{display:block}.details .pill{margin-bottom:9px}.controls .row{gap:16px}.field{margin-bottom:17px}}
+</style>
+</head>
+<body>
+<header><div class="brand"><span class="mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>dot studio</div><span class="tag">A little tool for random patterns</span></header>
+<main>
+<section class="intro"><div class="eyebrow">Random dot generator</div><h1>A little randomness.<br>Just the way you want it.</h1><p>Set your canvas, choose your dots, and make a pattern.</p></section>
+<div class="workspace">
+<form class="controls" id="controls" novalidate>
+<h2 class="section-title">01 / Canvas</h2>
+<div class="row"><div class="field"><label for="width">Width</label><div class="input-wrap"><input class="unit" id="width" type="number" min="16" max="4096" step="1" value="1024" required><span>px</span></div></div><div class="field"><label for="height">Height</label><div class="input-wrap"><input class="unit" id="height" type="number" min="16" max="4096" step="1" value="768" required><span>px</span></div></div></div>
+<div class="field"><span class="label" id="bgLabel">Background</span><div class="bg-row off" id="bgRow"><input id="bgColor" type="color" value="#ffffff" aria-labelledby="bgLabel"><input class="hex" id="bgHex" type="text" value="#ffffff" maxlength="7" autocomplete="off" spellcheck="false" aria-label="Background color hex code"></div><label class="check"><input id="transparent" type="checkbox" checked> Transparent background</label></div>
+<div class="rule"></div><h2 class="section-title">02 / Your dots</h2>
+<div class="field"><label for="diameter">Dot diameter</label><div class="input-wrap"><input class="unit" id="diameter" type="number" min="0.5" max="200" step="0.5" value="6" required><span>px</span></div><input id="diameterRange" type="range" min="0.5" max="30" step="0.5" value="6" aria-label="Adjust dot diameter"></div>
+<div class="field"><span class="label" id="modeLabel">How many dots</span><div class="seg" role="radiogroup" aria-labelledby="modeLabel"><label><input type="radio" name="mode" value="count" checked><span>Set number</span></label><label><input type="radio" name="mode" value="coverage"><span>Set coverage</span></label></div>
+<div class="row"><div><label for="count">Number of dots</label><input id="count" type="number" min="0" max="100000" step="1" value="3200" required></div><div><label for="coverage">Coverage</label><div class="input-wrap"><input class="unit" id="coverage" type="number" min="0" max="1000" step="any" value="11.51" required><span>%</span></div></div></div>
+<input id="amountRange" type="range" min="0" max="10000" step="50" value="3200" aria-label="Adjust number of dots"><p class="hint" id="coverageHint"></p></div>
+<div class="field"><span class="label" id="dotLabel">Dot color</span><div class="bg-row"><input id="dotColor" type="color" value="#000000" aria-labelledby="dotLabel"><input class="hex" id="dotHex" type="text" value="#000000" maxlength="7" autocomplete="off" spellcheck="false" aria-label="Dot color hex code"></div></div>
+<div class="field"><label for="opacity">Dot opacity <span class="value" id="opacityValue">50%</span></label><input id="opacity" type="range" min="5" max="100" step="1" value="50"></div>
+<div class="rule"></div><h2 class="section-title">03 / Pattern</h2>
+<div class="field"><label class="seed-label" for="seed">Random seed <span>Repeatable patterns</span></label><input id="seed" type="text" value="20261026" maxlength="100" autocomplete="off" spellcheck="false"><p class="hint">Same settings + same seed = same image.</p></div>
+<button class="primary" type="submit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M5.2 8a7 7 0 0 1 11.5-2L20 9M4 15l3.3 3A7 7 0 0 0 18.8 16"/></svg>New pattern</button>
+<button class="reset" type="button" id="reset">Reset settings</button><p class="error" role="alert" id="error"></p>
+</form>
+<section class="preview" aria-label="Pattern preview"><div class="preview-bar"><div class="preview-title"><span class="live" aria-hidden="true"></span>Preview <span class="toast" id="toast" aria-live="polite"></span></div><div class="actions"><button class="secondary" type="button" id="share"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>Copy link</button><button class="secondary" type="button" id="download"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></svg>Download PNG</button></div></div><div class="canvas-wrap"><canvas id="canvas" width="1024" height="768" role="img" aria-label="Random circular dots"></canvas></div><div class="preview-footer" aria-live="polite"><span id="dimensions">1024 × 768 px</span><span id="stats">3,200 dots · 6 px diameter</span><span>Export at full resolution</span></div></section>
+</div>
+<div class="details"><span class="pill">Independent sampling</span><p><strong>Random means room for clusters.</strong> Every dot center is sampled independently from the canvas pixels. Dots can overlap, and dots at the edges are cropped. Coverage is the dots' total area as a share of the image, before overlaps are taken into account. A seed gives the same dot positions whatever the colors.</p></div>
+</main><footer>Made for exploring random dots. Everything runs in your browser, even offline. Settings are saved in the page link, so “Copy link” shares the exact pattern.</footer>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const canvas = $('canvas');
+const DEFAULTS = {width:1024,height:768,mode:'count',count:3200,coverage:10,diameter:6,opacity:50,background:'#ffffff',transparent:true,color:'#000000',seed:'20261026'};
+const HEX = /^#[0-9a-f]{6}$/;
+let current = null;
+let pending;
+
+// Seeded 32-bit generator, with rejection sampling to avoid integer-range bias.
+function randomSource(seed) {
+  let h = 2166136261;
+  for (const c of seed) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
+  let state = h >>> 0;
+  const uint32 = () => {
+    state = (state + 0x6D2B79F5) >>> 0;
+    let t = state;
+    t = Math.imul(t ^ t >>> 15, t | 1);
+    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+    return (t ^ t >>> 14) >>> 0;
+  };
+  return max => {
+    const limit = Math.floor(4294967296 / max) * max;
+    let value;
+    do { value = uint32(); } while (value >= limit);
+    return value % max;
+  };
+}
+
+// Accepts "#abc", "abc", "#aabbcc" or "aabbcc"; returns "#aabbcc" or null.
+function normalizeHex(text) {
+  let value = text.trim().toLowerCase().replace(/^#?/, '#');
+  if (/^#[0-9a-f]{3}$/.test(value)) value = '#' + [...value.slice(1)].map(c => c + c).join('');
+  return HEX.test(value) ? value : null;
+}
+
+// Two linked inputs per color: the native picker and an editable hex field.
+// Invalid hex text leaves the picker unchanged and is restored on blur.
+function linkColor(picker, hex) {
+  picker.addEventListener('input', () => { hex.value = picker.value; hex.removeAttribute('aria-invalid'); });
+  hex.addEventListener('input', () => {
+    const value = normalizeHex(hex.value);
+    if (value) { picker.value = value; hex.removeAttribute('aria-invalid'); }
+    else hex.setAttribute('aria-invalid', 'true');
+  });
+  hex.addEventListener('blur', () => { hex.value = picker.value; hex.removeAttribute('aria-invalid'); });
+}
+
+function readSettings() {
+  const mode = currentMode();
+  // Read-only inputs skip browser validation, so check the active one only.
+  for (const id of ['width','height','diameter', mode]) {
+    if (!$(id).checkValidity()) throw new Error(`${$(id).labels[0].textContent} must be between ${$(id).min}${id === 'coverage' ? '%' : ''} and ${$(id).max}${id === 'coverage' ? '%.' : id === 'diameter' ? ', in steps of 0.5.' : ', using whole numbers.'}`);
+  }
+  const count = Number($('count').value);
+  if (count > 100000) throw new Error(`That coverage needs ${count.toLocaleString()} dots, but the maximum is 100,000. Lower the coverage or use bigger dots.`);
+  return {
+    width:Number($('width').value), height:Number($('height').value),
+    mode, count, coverage:Number($('coverage').value), diameter:Number($('diameter').value),
+    opacity:Number($('opacity').value),
+    background:$('bgColor').value, transparent:$('transparent').checked,
+    color:$('dotColor').value,
+    seed:$('seed').value
+  };
+}
+
+function render() {
+  clearTimeout(pending);
+  let settings;
+  try { settings = readSettings(); }
+  catch(error) { $('error').textContent = error.message; return false; }
+  const {width,height,count,diameter,opacity,background,transparent,color,seed} = settings;
+  canvas.width = width; canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,width,height);
+  if (!transparent) { ctx.fillStyle = background; ctx.fillRect(0,0,width,height); }
+  ctx.globalAlpha = opacity / 100;
+  ctx.fillStyle = color;
+  const randomInt = randomSource(seed);
+  for (let i=0;i<count;i++) {
+    const x = randomInt(width), y = randomInt(height);
+    ctx.beginPath(); ctx.arc(x+.5,y+.5,diameter/2,0,Math.PI*2); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  canvas.classList.toggle('transparent', transparent);
+  current = settings;
+  const coverage = formatPercent(coverageOf(count, diameter, width, height));
+  $('dimensions').textContent = `${width.toLocaleString()} × ${height.toLocaleString()} px`;
+  $('stats').textContent = `${count.toLocaleString()} dots · ${diameter} px · ${coverage}% coverage`;
+  canvas.setAttribute('aria-label',`${count} randomly positioned ${color} circles, ${diameter} pixels in diameter, on a ${width} by ${height} pixel ${transparent ? 'transparent' : background} canvas`);
+  $('error').textContent = '';
+  history.replaceState(null, '', '#' + encodeSettings(settings));
+  return true;
+}
+
+function scheduleRender() { clearTimeout(pending); pending = setTimeout(render,120); }
+
+// Settings live in the URL hash so a link reproduces the exact image.
+function encodeSettings(s) {
+  const amount = s.mode === 'coverage' ? {cov:s.coverage} : {n:s.count};
+  const params = new URLSearchParams({w:s.width,h:s.height,...amount,d:s.diameter,o:s.opacity,bg:s.transparent ? 'none' : s.background.slice(1),c:s.color.slice(1),s:s.seed});
+  return params.toString();
+}
+
+function applySettings(s) {
+  $('width').value = s.width; $('height').value = s.height;
+  document.querySelector(`input[name=mode][value=${s.mode}]`).checked = true;
+  $('count').value = s.count; $('coverage').value = s.coverage; $('diameter').value = s.diameter;
+  $('opacity').value = s.opacity;
+  $('bgColor').value = $('bgHex').value = s.background;
+  $('transparent').checked = s.transparent;
+  $('dotColor').value = $('dotHex').value = s.color;
+  $('seed').value = s.seed;
+  synchronize();
+}
+
+function settingsFromHash() {
+  const params = new URLSearchParams(location.hash.slice(1));
+  if (!params.has('w')) return null;
+  const s = {...DEFAULTS};
+  const num = (key, field) => { if (params.has(key) && params.get(key) !== '' && !isNaN(params.get(key))) s[field] = Number(params.get(key)); };
+  num('w','width'); num('h','height'); num('n','count'); num('cov','coverage'); num('d','diameter'); num('o','opacity');
+  if (params.has('cov') && !params.has('n')) s.mode = 'coverage';
+  const bg = params.get('bg');
+  if (bg && normalizeHex(bg)) { s.background = normalizeHex(bg); s.transparent = false; }
+  if (normalizeHex(params.get('c') || '')) s.color = normalizeHex(params.get('c'));
+  if (params.has('s')) s.seed = params.get('s').slice(0,100);
+  return s;
+}
+
+const currentMode = () => document.querySelector('input[name=mode]:checked').value;
+
+// Total dot area as a percentage of the image, ignoring overlaps.
+const coverageOf = (count, diameter, width, height) => count * Math.PI * (diameter / 2) ** 2 / (width * height) * 100;
+const formatPercent = value => String(Math.round(value * 100) / 100);
+
+// One of count/coverage is set by the user; the other is derived from it.
+function synchronize() {
+  const mode = currentMode();
+  const width = Number($('width').value), height = Number($('height').value), diameter = Number($('diameter').value);
+  if ($('width').checkValidity() && $('height').checkValidity() && $('diameter').checkValidity()) {
+    if (mode === 'coverage' && $('coverage').checkValidity()) {
+      $('count').value = Math.round(Number($('coverage').value) / coverageOf(1, diameter, width, height));
+    } else if (mode === 'count' && $('count').checkValidity()) {
+      $('coverage').value = formatPercent(coverageOf(Number($('count').value), diameter, width, height));
+    }
+    // With n dots of area a placed at random, the expected uncovered share is (1 - a/A)^n ≈ e^(-coverage).
+    const covered = 100 * (1 - Math.exp(-coverageOf(Number($('count').value), diameter, width, height) / 100));
+    $('coverageHint').textContent = `Dots overlap at random, so on average about ${formatPercent(covered)}% of the image is actually covered.`;
+  }
+  $('count').readOnly = mode !== 'count';
+  $('coverage').readOnly = mode !== 'coverage';
+  const range = $('amountRange');
+  if (mode === 'count') Object.assign(range, {min:0, max:10000, step:50, value:Math.min(10000,Number($('count').value))});
+  else Object.assign(range, {min:0, max:100, step:0.5, value:Math.min(100,Number($('coverage').value))});
+  range.setAttribute('aria-label', mode === 'count' ? 'Adjust number of dots' : 'Adjust coverage');
+  $('diameterRange').value = Math.min(30,Number($('diameter').value));
+  $('opacityValue').textContent = `${$('opacity').value}%`;
+  $('bgRow').classList.toggle('off', $('transparent').checked);
+}
+
+function flash(message) {
+  $('toast').textContent = message;
+  setTimeout(() => { if ($('toast').textContent === message) $('toast').textContent = ''; }, 2500);
+}
+
+linkColor($('bgColor'), $('bgHex'));
+linkColor($('dotColor'), $('dotHex'));
+$('controls').addEventListener('input', event => {
+  if(event.target.id === 'amountRange') $(currentMode()).value = event.target.value;
+  else if(event.target.id === 'diameterRange') $('diameter').value = event.target.value;
+  synchronize();
+  scheduleRender();
+});
+$('controls').addEventListener('change', () => { synchronize(); scheduleRender(); });
+$('controls').addEventListener('submit', event => {
+  event.preventDefault();
+  try { readSettings(); } catch(error) { $('error').textContent = error.message; return; }
+  const randomSeed = new Uint32Array(1);
+  crypto.getRandomValues(randomSeed);
+  $('seed').value = String(randomSeed[0]); render();
+});
+$('reset').addEventListener('click', () => { applySettings(DEFAULTS); render(); });
+$('share').addEventListener('click', async () => {
+  if(!render()) return;
+  try { await navigator.clipboard.writeText(location.href); flash('Link copied'); }
+  catch { flash('Copy the link from the address bar'); }
+});
+$('download').addEventListener('click', () => {
+  if(!render()) return;
+  const settings = {...current};
+  canvas.toBlob(blob => {
+    if(!blob) { $('error').textContent = 'The image could not be exported. Try a smaller canvas.'; return; }
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    const seedName = settings.seed.replace(/[^a-zA-Z0-9_-]/g,'_').slice(0,40) || 'empty';
+    link.download = `random-dots_${settings.width}x${settings.height}_${settings.count}dots_${settings.diameter}px_${settings.color.slice(1)}_seed-${seedName}.png`;
+    document.body.append(link); link.click(); link.remove();
+    setTimeout(() => URL.revokeObjectURL(url),10000);
+  },'image/png');
+});
+
+applySettings(settingsFromHash() || DEFAULTS);
+render();
+</script>
+</body>
+</html>
